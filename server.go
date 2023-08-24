@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/jordanpagewhite/go-fiber-first/api/routes"
@@ -21,12 +22,16 @@ func main() {
 		log.Fatal("Database Connection Error $s", err)
 	}
 	fmt.Println("Database connection success!")
-	commentCollection := db.Collection("comments")
+	commentCollection := db.Collection(os.Getenv("DB_NAME"))
 	commentRepo := comment.NewRepo(commentCollection)
 	commentService := comment.NewService(commentRepo)
 
 	app := fiber.New()
-	app.Use(cors.New())
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "localhost",
+		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
+		AllowMethods: "GET, POST, PUT, DELETE",
+	}))
 	api := app.Group("/api")
 	v1 := api.Group("/v1")
 	routes.CommentRouter(v1, commentService)
@@ -37,13 +42,14 @@ func main() {
 
 func databaseConnection() (*mongo.Database, context.CancelFunc, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	db_string := fmt.Sprintf("mongodb://%s:%s@%s:%s/%s?authSource=admin", os.Getenv("DB_USERNAME"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_NAME"))
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(
-		"mongodb://username:password@localhost:27017/fiber").SetServerSelectionTimeout(5*time.
+		db_string).SetServerSelectionTimeout(5*time.
 		Second))
 	if err != nil {
 		cancel()
 		return nil, nil, err
 	}
-	db := client.Database("comments")
+	db := client.Database(os.Getenv("DB_NAME"))
 	return db, cancel, nil
 }

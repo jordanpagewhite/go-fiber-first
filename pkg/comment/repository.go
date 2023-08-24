@@ -11,7 +11,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-// Repository interface allows us to access the CRUD Operations in mongo here.
 type Repository interface {
 	CreateComment(comment *entities.Comment) (*entities.Comment, error)
 	ReadComment() (*[]presenter.Comment, error)
@@ -22,14 +21,12 @@ type repository struct {
 	Collection *mongo.Collection
 }
 
-// NewRepo is the single instance repo that is being created.
 func NewRepo(collection *mongo.Collection) Repository {
 	return &repository{
 		Collection: collection,
 	}
 }
 
-// CreateComment is a mongo repository that helps to create comments
 func (r *repository) CreateComment(comment *entities.Comment) (*entities.Comment, error) {
 	comment.ID = primitive.NewObjectID()
 	comment.CreatedAt = time.Now()
@@ -41,7 +38,6 @@ func (r *repository) CreateComment(comment *entities.Comment) (*entities.Comment
 	return comment, nil
 }
 
-// ReadComment is a mongo repository that helps to fetch comments
 func (r *repository) ReadComment() (*[]presenter.Comment, error) {
 	var comments []presenter.Comment
 	cursor, err := r.Collection.Find(context.Background(), bson.D{})
@@ -56,7 +52,6 @@ func (r *repository) ReadComment() (*[]presenter.Comment, error) {
 	return &comments, nil
 }
 
-// UpdateComment is a mongo repository that helps to update comments
 func (r *repository) UpdateComment(comment *entities.Comment) (*entities.Comment, error) {
 	comment.UpdatedAt = time.Now()
 	_, err := r.Collection.UpdateOne(context.Background(), bson.M{"_id": comment.ID}, bson.M{"$set": comment})
@@ -66,7 +61,6 @@ func (r *repository) UpdateComment(comment *entities.Comment) (*entities.Comment
 	return comment, nil
 }
 
-// DeleteComment is a mongo repository that helps to delete comments
 func (r *repository) DeleteComment(ID string) error {
 	commentID, err := primitive.ObjectIDFromHex(ID)
 	if err != nil {
