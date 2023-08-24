@@ -42,7 +42,7 @@ func main() {
 
 func databaseConnection() (*mongo.Database, context.CancelFunc, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	db_string := fmt.Sprintf("mongodb://%s:%s@%s:%s/%s?authSource=admin", os.Getenv("DB_USERNAME"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_NAME"))
+	db_string := fmt.Sprintf("mongodb://%s:%s/%s", os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_NAME"))
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(
 		db_string).SetServerSelectionTimeout(5*time.
 		Second))

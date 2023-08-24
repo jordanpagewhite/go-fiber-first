@@ -15,9 +15,6 @@ services:
   mongo:
     image: 'mongo:7.0.0'
     container_name: 'mongo'
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=example
     ports:
       - '27100:27017'
     volumes:
