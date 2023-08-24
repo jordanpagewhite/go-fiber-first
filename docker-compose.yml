@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/usr/src/app
+    command: air server --port 3000 -c .air.toml
+  mongo:
+    image: 'mongo:7.0.0'
+    container_name: 'mongo'
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${DB_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${DB_PASSWORD}
+    ports:
+      - '27100:27017'
+    volumes:
+      - ./data/dev/mongo:/data/db
